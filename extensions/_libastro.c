@@ -149,13 +149,8 @@ static int PyNumber_AsDouble(PyObject *o, double *dp)
    slower than raw C but are sturdy and robust and eliminate all of the
    locale problems to which raw C calls are liable. */
 
-static PyObject *colon = 0;
-
-static int scansexa(PyObject *o, double *dp) {
-     if (!colon) {
-          colon = PyUnicode_FromString(":");  /* singleton string we need */
-     }
-     PyObject *list = PyUnicode_Split(o, colon, -1);
+static int scansexa_sep(PyObject *o, double *dp, PyObject *sep) {
+     PyObject *list = PyUnicode_Split(o, sep, -1);
      if (!list) {
           return -1;
      }
@@ -195,6 +190,16 @@ static int scansexa(PyObject *o, double *dp) {
      *dp = d;
      Py_DECREF(list);
      return 0;
+}
+
+static PyObject *colon = 0;
+
+int scansexa(PyObject *o, double *dp) {
+     if (!colon) {
+          colon = PyUnicode_FromString(":");  /* singleton string we need */
+     }
+     if (!scansexa_sep(o,dp,colon)) return 0;
+     return scansexa_sep(o,dp,NULL);
 }
 
 /* The libastro library offers a "getBuiltInObjs()" function that
