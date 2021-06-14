@@ -195,11 +195,35 @@ static int scansexa_sep(PyObject *o, double *dp, PyObject *sep) {
 static PyObject *colon = 0;
 
 int scansexa(PyObject *o, double *dp) {
+     int colon_length = -1;
+     int space_length = -1;
+
      if (!colon) {
           colon = PyUnicode_FromString(":");  /* singleton string we need */
      }
-     if (!scansexa_sep(o,dp,colon)) return 0;
-     return scansexa_sep(o,dp,NULL);
+
+     PyObject *list = PyUnicode_Split(o, colon, -1);
+     if (list) {
+          colon_length = PyList_Size(list);
+          Py_DECREF(list);
+     }
+
+     list = PyUnicode_Split(o, NULL, -1);
+     if (list) {
+          space_length = PyList_Size(list);
+          Py_DECREF(list);
+     }
+
+     if (colon_length < 0 && space_length < 0) {
+          return -1;
+     }
+
+     if (space_length > colon_length) {
+          fprintf(stderr,"=====================Running scansexa(o='%s',dp,NULL);space_length=%d;colon_length=%d\n",PyUnicode_AS_DATA(o),space_length,colon_length);
+          fflush(stderr);
+          return scansexa_sep(o,dp,NULL);
+     }
+     return scansexa_sep(o,dp,colon);
 }
 
 /* The libastro library offers a "getBuiltInObjs()" function that
