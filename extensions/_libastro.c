@@ -219,8 +219,6 @@ int scansexa(PyObject *o, double *dp) {
      }
 
      if (space_length > colon_length) {
-          fprintf(stderr,"=====================Running scansexa(o='%s',dp,NULL);space_length=%d;colon_length=%d\n",PyUnicode_AS_DATA(o),space_length,colon_length);
-          fflush(stderr);
           return scansexa_sep(o,dp,NULL);
      }
      return scansexa_sep(o,dp,colon);
